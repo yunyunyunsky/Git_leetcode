@@ -22,8 +22,10 @@ n_samples = 1000  # 样本数量
 n_channels = 15   # 模拟的微波亮温通道数
 
 # 模拟MWHTS亮温特征（X），数值范围在180K到300K之间
-X_raw = np.random.uniform(low=180, high=300, size=(n_samples, n_channels))
 
+X_raw = np.random.uniform(low=180, high=300, size=(n_samples, n_channels))
+noise = np.random.normal(loc=0, scale=5, size=X_raw.shape)
+X_raw = X_raw + noise
 # 【核心修改】引入更复杂的非线性关系来生成降水量标签
 bright_temp_mean = X_raw.mean(axis=1)  # 计算每个样本的亮温均值
 
@@ -39,7 +41,7 @@ y_raw_nonlinear = base_precip * np.exp(-exp_coeff * (bright_temp_mean - 180)) + 
 y_raw_nonlinear = np.clip(y_raw_nonlinear, 0, 50)
 
 # 用新生成的非线性 y_raw 替换原来的 y_raw
-y_raw = y_raw_nonlinear
+y_raw = y_raw_nonlinear + np.random.normal(loc=0, scale=0.1, size=poly_part.shape)
 
 print(f"生成的降水数据范围: {y_raw.min():.2f} ~ {y_raw.max():.2f} mm/hr")
 
